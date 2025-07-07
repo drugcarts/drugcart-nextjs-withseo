@@ -20,7 +20,7 @@ const AddressUpload = () => {
   const formik = useFormik({
     initialValues: {
       cus_name: "",
-      type: "",
+      type: type,
       lastname: "",
       email: "",
       lastname: "",
@@ -37,11 +37,14 @@ const AddressUpload = () => {
     },
   });
 
-  useEffect(() => {
-    if (addresses?._id) {
-      setActiveTab("saved")
-    }
-  }, [addresses?._id])
+useEffect(() => {
+  if (!addresses || Object.values(addresses).length === 0) {
+    setActiveTab("add");
+  } else {
+    setActiveTab("saved");
+  }
+}, [addresses]);
+// console.log('userAddress', userAddress);
 
   return (
     <>
@@ -60,15 +63,17 @@ const AddressUpload = () => {
                 >
                   Add New Address
                 </button>
-                <button
-                  className={`px-4 py-2 font-semibold rounded-md ${activeTab === "saved"
-                    ? "bg-pink-200 text-pink-700"
-                    : "text-gray-600"
-                    }`}
-                  onClick={() => setActiveTab("saved")}
-                >
-                  Saved Address
-                </button>
+                {userAddress.length !== 0? (
+                  <button
+                    className={`px-4 py-2 font-semibold rounded-md ${activeTab === "saved"
+                      ? "bg-pink-200 text-pink-700"
+                      : "text-gray-600"
+                      }`}
+                    onClick={() => setActiveTab("saved")}
+                  >
+                    Saved Address
+                  </button>
+                ) : null}
               </div>
               {activeTab === "add" && (
                 <form className="space-y-4" onSubmit={formik.handleSubmit}>
@@ -249,7 +254,7 @@ const AddressUpload = () => {
                     <button
                       type="submit"
                       className="w-40 bg-pink-700 text-white py-2 rounded mr-2"
-                      disabled={Object.values(addresses).length === 0 ? true : false}
+                          disabled={!addresses || Object.values(addresses).length === 0}
                       onClick={() => router.push('/summary')}
                     >
                       Submit

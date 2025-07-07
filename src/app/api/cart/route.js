@@ -3,216 +3,44 @@ import Cart from '../../../models/Cart';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
+  const { success, user, message } = await authenticateUser();
 
-    const { success, user, message } = await authenticateUser();
-    console.log(success);
+  if (!success) {
+    return NextResponse.json({ error: message }, { status: 401 });
+  }
 
-    if (!success) {
-        return NextResponse.json({ error: message }, { status: 401 })
+  const data = await request.json();
+
+  try {
+    const existingCart = await Cart.findOne({
+      userId: user._id,
+      product_name: data.product_name,
+    });
+
+    if (existingCart) {
+      const updatedCart = await Cart.findOneAndUpdate(
+        { userId: user._id, product_name: data.product_name },
+        { $inc: { quantity: 1 } },
+        { new: true }
+      );
+      return NextResponse.json(updatedCart, { status: 200 });
     }
 
-    const {
-        quantity,
-        cat_name,
-        subcat_name,
-        generices,
-        product_code,
-        product_name,
-        url,
-        genericname,
-        brand,
-        manufactuer,
-        manufactueraddress,
-        tabscount,
-        strength,
-        packageName,
-        price,
-        packing,
-        product_img,
-        description,
-        disclaimer,
-        stock,
-        saleprice,
-        percentage,
-        rexrequired,
-        orgin,
-        storage,
-        temperature,
-        timestamp,
-        writebyid,
-        reviewbyid,
-        faq,
-        reference,
-        metatitle,
-        metakeyword,
-        metadesc,
-        varient,
-        imagealt,
-        vedio,
-        vedioalt,
-        userupdate,
-        updatetimestamp,
-        userid,
-        date,
-        referwebsite,
-        keybenefits,
-        keyingredients,
-        expires,
-        usesofmeds,
-        useofbenefits,
-        indicat,
-        indication,
-        mechanism,
-        medicinework,
-        contraindications,
-        sideeffects,
-        faqs,
-        pregnancy,
-        breastfeeding,
-        kidneyproblem,
-        liverdisease,
-        heartdisease,
-        asthma,
-        takemedicine,
-        adult,
-        childrenmed,
-        elderlymed,
-        alcohol,
-        driving,
-        warnings,
-        talkdoctor,
-        instructions,
-        druginteraction,
-        drugfood,
-        drugdiease,
-        fooditems,
-        overdose,
-        misseddose,
-        disposal,
-        fasttag,
-        refer,
-        ingredients,
-        direction,
-        dosages,
-        precaution,
-        prostatus,
-        paymenttype,
-        retunpolicy,
-        gst,
-        hsn,
-    } = await request.json();
+    // 🛠 Exclude _id from data
+    const { _id, ...safeData } = data;
 
-    const isCart = await Cart.findOne({ product_name });
-    if (isCart) {
-        const updatedCart = await Cart.findOneAndUpdate(
-            { userId: user?._id, product_name },
-            { $inc: { quantity: 1 } },
-            { new: true, upsert: false }
-        );
-        return NextResponse.json(updatedCart, { status: 200 })
-    }
+    const newCart = new Cart({
+      userId: user._id,
+      productId: _id, // Save product's _id as productId
+      ...safeData,
+    });
 
-    try {
-        // const existingItem = await Cart.find((item) => item.productId.toString() === productId);
-
-        const mycart = new Cart({
-            userId: user?._id,
-            quantity,
-            cat_name,
-            subcat_name,
-            generices,
-            product_code,
-            product_name,
-            url,
-            genericname,
-            brand,
-            manufactuer,
-            manufactueraddress,
-            tabscount,
-            strength,
-            packageName,
-            price,
-            packing,
-            product_img,
-            description,
-            disclaimer,
-            stock,
-            saleprice,
-            percentage,
-            rexrequired,
-            orgin,
-            storage,
-            temperature,
-            timestamp,
-            writebyid,
-            reviewbyid,
-            faq,
-            reference,
-            metatitle,
-            metakeyword,
-            metadesc,
-            varient,
-            imagealt,
-            vedio,
-            vedioalt,
-            userupdate,
-            updatetimestamp,
-            userid,
-            date,
-            referwebsite,
-            keybenefits,
-            keyingredients,
-            expires,
-            usesofmeds,
-            useofbenefits,
-            indicat,
-            indication,
-            mechanism,
-            medicinework,
-            contraindications,
-            sideeffects,
-            faqs,
-            pregnancy,
-            breastfeeding,
-            kidneyproblem,
-            liverdisease,
-            heartdisease,
-            asthma,
-            takemedicine,
-            adult,
-            childrenmed,
-            elderlymed,
-            alcohol,
-            driving,
-            warnings,
-            talkdoctor,
-            instructions,
-            druginteraction,
-            drugfood,
-            drugdiease,
-            fooditems,
-            overdose,
-            misseddose,
-            disposal,
-            fasttag,
-            refer,
-            ingredients,
-            direction,
-            dosages,
-            precaution,
-            prostatus,
-            paymenttype,
-            retunpolicy,
-            gst,
-            hsn,
-        });
-
-
-        await mycart.save();
-        return NextResponse.json(mycart, { status: 200 })
-    } catch (error) {
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
-    }
+    await newCart.save();
+    return NextResponse.json(newCart, { status: 200 });
+  } catch (error) {
+    console.error("Cart POST error:", error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
 }
 
 export async function GET() {
@@ -226,9 +54,4 @@ export async function GET() {
 
     console.log(userWithCart);
     return NextResponse.json(userWithCart, { status: 200 })
-    // if (!success) {
-    //     return res.status(401).json({ message });
-    // }
-
-    // res.status(200).json({ cart: user.cart });
 }
