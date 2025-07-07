@@ -5,6 +5,7 @@ import { GetProductTypeService } from "@/services/home/productService";
 import { getBlogData } from "@/services/home/blogService";
 import SliderClient from "@/components/home/SliderClient";
 import TrandingProductClient from "@/components/home/TrandingProductClient";
+import TrandingProduct from "@/components/home-page/trandingProduct";
 import BannerGroup from "@/components/home/BannerGroup";
 import ServiceGroup from "@/components/home/ServiceGroup";
 import FeaturedPackage from "@/components/home/FeaturedPackage";
@@ -118,7 +119,8 @@ export default async function Home() {
           <TopCategoryClient categories={data?.categories || []} />
         </div>
       </section>
-      <TrandingProductClient initialData={productData} initialTab={type} />
+      {/* <TrandingProductClient initialData={productData} initialTab={type} /> */}
+      <TrandingProduct />
       <BannerGroup />
       <ServiceGroup />
       <FeaturedPackage />
