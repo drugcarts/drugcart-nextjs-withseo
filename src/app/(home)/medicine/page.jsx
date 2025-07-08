@@ -7,8 +7,7 @@ import { getMetatags } from "@/lib/getMetatags";
 
 export default async function Medicine({ searchParams }) {
   const { letter, page } = await searchParams || {};
-  const firstLetter = (letter || "A").toUpperCase();
-
+  const firstLetter = letter
   const [medicineBanner, data] = await Promise.all([
     getMedicineBannerData("medicine"),
     getCategoryData(firstLetter, page || 1),
