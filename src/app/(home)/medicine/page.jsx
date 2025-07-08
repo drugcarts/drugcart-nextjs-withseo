@@ -3,25 +3,41 @@ import {
   getMedicineBannerData,
 } from "@/services/home/categoryService";
 import MedicineClient from "./MedicineClient";
+import { getMetatags } from "@/lib/getMetatags";
 
-import { getMetatags } from "@/lib/getMetatags"; // e.g., use 'about-us' as slug
+export default async function Medicine({ searchParams }) {
+  const { letter, page } = await searchParams || {};
+  const firstLetter = (letter || "A").toUpperCase();
 
+  const [medicineBanner, data] = await Promise.all([
+    getMedicineBannerData("medicine"),
+    getCategoryData(firstLetter, page || 1),
+  ]);
+
+  return (
+    <MedicineClient
+      pageBannerUrl={medicineBanner}
+      pageNo={page || 1}
+      firstLetter={firstLetter}
+      categoryData={data?.categories || []}
+      pagination={data?.pagination || {}}
+    />
+  );
+}
+
+// Metadata for SEO
 export async function generateMetadata() {
-  const slug = "medicine"; // or whatever slug matches your API
+  const slug = "medicine";
 
   try {
     const post = await getMetatags(slug);
+
     return {
       title:
-        post.metatitle ||
-        "Drugcarts - Find best medicines and healthcare products online|Drugcarts.com",
+        post.metatitle || "Drugcarts - Best medicines online | Drugcarts.com",
       description:
-        post.metadesc ||
-        "Learn about DrugCarts – India’s trusted digital health platform for pharmacy, diagnostics, and homecare services.",
-      keywords:
-        post.metakeyword ||
-        "online pharmacy, DrugCarts, health care, diagnostics, homecare",
-
+        post.metadesc || "Buy medicine & healthcare products online at Drugcarts.",
+      keywords: post.metakeyword || "medicine, health, drugcarts",
       metadataBase: new URL("https://drugcarts.com/medicine"),
       alternates: {
         canonical: "https://drugcarts.com/medicine",
@@ -29,12 +45,11 @@ export async function generateMetadata() {
           en: "https://drugcarts.com/medicine",
         },
       },
-
       openGraph: {
         siteName: "Drugcarts",
         title: post.metatitle,
         description: post.metadesc,
-        url: `https://drugcarts.com/medicine`, // adjust if needed
+        url: "https://drugcarts.com/medicine",
         images: [
           {
             url:
@@ -47,15 +62,13 @@ export async function generateMetadata() {
         ],
         type: "website",
       },
-
       twitter: {
-        card: "https://assets2.drugcarts.com/static/image/logodrugnew.jpg",
+        card: "summary_large_image",
         site: "@Drugcarts",
         title: post.metatitle,
         description: post.metadesc,
         images: ["https://assets2.drugcarts.com/static/image/logodrugnew.jpg"],
       },
-
       robots: {
         index: true,
         follow: true,
@@ -74,31 +87,12 @@ export async function generateMetadata() {
     };
   } catch (error) {
     return {
-      title:
-        "Drugcarts - Find best medicines and healthcare products online|Drugcarts.com",
-      description: "Page not found or failed to load metadata.",
-      robots: { index: false, follow: false },
+      title: "Drugcarts - Best medicines online | Drugcarts.com",
+      description: "Page failed to load.",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 }
-
-const Medicine = async () => {
-  const page = 1;
-  const selectedLetter = "A";
-  const medicineBanner = await getMedicineBannerData("medicine");
-  const data = await getCategoryData(selectedLetter, page);
-
-  return (
-    <>
-      <MedicineClient
-        pageBannerUrl={medicineBanner}
-        categoryData={data?.categories || []}
-        pageNo={page}
-        pagination={data?.pagination}
-        firstLetter={selectedLetter}
-      />
-    </>
-  );
-};
-
-export default Medicine;

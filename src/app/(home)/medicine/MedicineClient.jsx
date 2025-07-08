@@ -1,116 +1,144 @@
 "use client";
-import { IMAGES } from "@/components/common/images";
+
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Box, Pagination, Typography } from "@mui/material";
-import { getCategoryData } from "@/services/home/categoryService";
+import { IMAGES } from "@/components/common/images";
 
-const MedicineClient = ({
-  categoryData,
+export default function MedicineClient({
   pageBannerUrl,
-  pageNo,
-  firstLetter,
+  categoryData,
   pagination,
-}) => {
+  firstLetter: initialLetter,
+  pageNo: initialPage,
+}) {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(pageNo);
-  const [selectedLetter, setSelectedLetter] = useState(firstLetter);
-  const [categories, setCategories] = useState(categoryData || []);
+  const searchParams = useSearchParams();
+
+  const [selectedLetter, setSelectedLetter] = useState(initialLetter);
+  const [currentPage, setCurrentPage] = useState(Number(initialPage) || 1);
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-  const categroyClick = (cat_url) => {
-    router.push(`/catalog/${cat_url}`);
+  // Sync state with URL params whenever they change (including browser back/forward)
+  useEffect(() => {
+    const letterParam = searchParams.get("letter") || initialLetter || "A";
+    const pageParam = parseInt(searchParams.get("page") || initialPage || "1", 10);
+
+    if (letterParam !== selectedLetter) setSelectedLetter(letterParam);
+    if (pageParam !== currentPage) setCurrentPage(pageParam);
+  }, [searchParams, initialLetter, initialPage]);
+
+  const handleLetterClick = (letter) => {
+    router.push(`/medicine?letter=${letter}&page=1`, { scroll: false });
   };
 
-  useEffect(() => {
-    // if (firstLetter !== selectedLetter || currentPage !== pageNo) {
-    //   const params = new URLSearchParams();
-    //   params.set("page", currentPage.toString());
-    //   params.set("selectedLetter", selectedLetter);
-    // }
-    const fetchData = async () => {
-      const res = await getCategoryData(selectedLetter, currentPage);
-      if (res?.categories) {
-        setCategories(res?.categories);
+  const handlePageChange = (_, value) => {
+    router.push(`/medicine?letter=${selectedLetter}&page=${value}`, { scroll: false });
+  };
+
+  const handleCategoryClick = (url) => {
+    router.push(`/catalog/${url}`);
+  };
+
+  const CategoryImage = ({ categories }) => {
+    const primaryImage = categories?.cat_img
+      ? `https://assets2.drugcarts.com/category/thumb/${categories.cat_img}`
+      : null;
+
+    const fallbackImage = categories?.cat_img
+      ? `https://drugcarts-nextjs.s3.ap-south-1.amazonaws.com/category/thumb/${categories.cat_img}`
+      : null;
+
+    const [imgSrc, setImgSrc] = useState(primaryImage || IMAGES.NO_IMAGE);
+
+    const handleError = () => {
+      if (imgSrc !== fallbackImage && fallbackImage) {
+        setImgSrc(fallbackImage);
+      } else {
+        setImgSrc(IMAGES.NO_IMAGE);
       }
     };
-    fetchData();
-  }, [currentPage, selectedLetter]);
 
-  console.log(currentPage, selectedLetter, "ABDC", categories);
-
+    return (
+      <Image
+        priority
+        src={imgSrc}
+        alt={categories?.category_name || "Category Image"}
+        width={100}
+        height={100}
+        className={`mb-3 mx-auto object-cover ${categories.cat_img ? "bg-bgcancer" : "bg-white"
+          } rounded-full p-2`}
+        onError={handleError}
+      />
+    );
+  };
   return (
-    <section className="max-w-7xl mx-auto">
+    <section className="max-w-7xl mx-auto py-8">
       <Image
         priority
         src={
           pageBannerUrl?.image
-            ? `https://assets1.drugcarts.com/admincolor/homepage/pagebanner/${pageBannerUrl?.image}`
+            ? `https://assets1.drugcarts.com/admincolor/homepage/pagebanner/${pageBannerUrl.image}`
             : IMAGES.NO_IMAGE
         }
         alt="Ayush Banner"
-        className="w-[100%] h-[200px] rounded-xl"
-        width={500}
-        height={100}
+        className="w-full h-[200px] rounded-xl"
+        width={1200}
+        height={200}
       />
-      <div className="py-2 text-xl font-bold px-2 md:px-0">
-        <h2>A - Z Order Medicine</h2>
-        <div className="flex flex-wrap justify-center gap-2 my-4">
-          {alphabet.map((letter, i) => (
-            <button
-              className={`${
-                selectedLetter === letter ? "bg-[#B7084B]" : "bg-[#35A24D]"
-              } px-2 text-white rounded-md`}
-              key={i}
-              onClick={() => {
-                setSelectedLetter(letter);
-                setCurrentPage(1);
-              }}
-            >
-              {letter}
-            </button>
-          ))}
+
+      <div className="py-4 text-xl font-bold text-center">A - Z Order Medicine</div>
+
+      <div className="flex flex-wrap justify-center gap-2 mb-6">
+        {alphabet.map((letter) => (
           <button
-            className={`${
-              selectedLetter === "" ? "bg-[#B7084B]" : "bg-[#35A24D]"
-            } px-2 text-white rounded-md`}
-            onClick={() => {
-              setSelectedLetter("");
-              setCurrentPage(1);
-            }}
+            key={letter}
+            className={`${selectedLetter === letter ? "bg-[#B7084B]" : "bg-[#35A24D]"
+              } px-3 py-1 text-white rounded-md`}
+            onClick={() => handleLetterClick(letter)}
           >
-            View All
+            {letter}
           </button>
-        </div>
+        ))}
+        <button
+          className={`${selectedLetter === "" ? "bg-[#B7084B]" : "bg-[#35A24D]"
+            } px-3 py-1 text-white rounded-md`}
+          onClick={() => handleLetterClick("")}
+        >
+          View All
+        </button>
       </div>
+
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3 pb-20 px-2 md:px-0">
-        {categories &&
-          categories?.map((category, i) => (
-            <div
-              className="bg-bgshop rounded-lg p-4 cursor-pointer"
-              key={i}
-              onClick={() => categroyClick(category?.url)}
-            >
-              <p className="text-center">
-                <Image
-                  width={100}
-                  height={100}
-                  src={
-                    category?.cat_img
-                      ? `https://assets2.drugcarts.com/category/thumb/${category?.cat_img}`
-                      : IMAGES.NO_IMAGE
-                  }
-                  alt={category?.category_name}
-                  className={`mb-3 mx-auto object-cover ${
-                    category?.cat_img ? "bg-bgcancer" : "bg-white"
+        {categoryData.map((category, i) => (
+          <div
+            key={i}
+            className="bg-bgshop rounded-lg p-4 cursor-pointer"
+            onClick={() => handleCategoryClick(category.url)}
+          >
+            <p className="text-center">
+              {/* <Image
+                width={100}
+                height={100}
+                src={
+                  category.cat_img
+                    ? `https://assets2.drugcarts.com/category/thumb/${category.cat_img}`
+                    : IMAGES.NO_IMAGE
+                }
+                alt={category.category_name}
+                className={`mb-3 mx-auto object-cover ${category.cat_img ? "bg-bgcancer" : "bg-white"
                   } rounded-full p-2`}
-                />
-                <span className="capitalize">{category?.category_name}</span>
-              </p>
-            </div>
-          ))}
+              /> */}
+              <CategoryImage
+                categories={category}
+              />
+              <span className="capitalize">{category.category_name}</span>
+            </p>
+          </div>
+        ))}
       </div>
+
       <Box
         sx={{
           my: 2,
@@ -120,19 +148,16 @@ const MedicineClient = ({
         }}
       >
         <Typography fontFamily={"Poppins"}>
-          Showing 1-{10} of {pagination?.totalItems} entries
+          Showing 1–10 of {pagination.totalItems || 0} entries
         </Typography>
-        <br />
         <Pagination
           size="large"
-          count={pagination?.totalPages}
+          count={pagination.totalPages || 1}
           page={currentPage}
           color="secondary"
-          onChange={(_, value) => setCurrentPage(value)}
+          onChange={handlePageChange}
         />
       </Box>
     </section>
   );
-};
-
-export default MedicineClient;
+}
