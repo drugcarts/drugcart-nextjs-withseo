@@ -123,7 +123,7 @@ const MyOrders = () => {
                                         {order?.trackingInfo?.orderStatus}
                                     </td>
                                     <td className="px-4 py-2 border">{DateFormat(order?.createdAt)}</td>
-                                    <td className="px-4 py-2 border">{order?.totalPrice}</td>
+                                    <td className="px-4 py-2 border">{order?.itemsPrice?.toFixed(2)}</td>
                                     <td className="px-4 py-2 border"><p className="text-blue-600 cursor-pointer" onClick={() => router.push(`/myorder/${order?.orderId}`)}>View</p></td>
                                 </tr>
                             ))}

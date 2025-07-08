@@ -163,7 +163,7 @@ export default function Invoice() {
                     <td className="border px-2 py-1">{order?.packageName}</td>
                     <td className="border px-2 py-1">{order?.quantity}</td>
                     <td className="border px-2 py-1">{order?.price}</td>
-                    <td className="border px-2 py-1">Rs. {order?.price}</td>
+                    <td className="border px-2 py-1">Rs. {(order?.saleprice * order?.quantity).toFixed(2)}</td>
                   </tr>
                 ))}
                 <tr>
@@ -173,7 +173,7 @@ export default function Invoice() {
                   <td className="border px-2 py-1" colSpan="2">
                     Shiping Charges:
                   </td>
-                  <td className="border px-2 py-1">Rs. 0</td>
+                  <td className="border px-2 py-1">Rs. {orderGetData?.shippingPrice?.toFixed(2)}</td>
                 </tr>
                 <tr>
                   <td className="border px-2 py-1" colSpan="5">
@@ -183,7 +183,7 @@ export default function Invoice() {
                     <p className="font-semibold"> TOTAL :</p>
                   </td>
                   <td className="border px-2 py-1">
-                    <p className="font-semibold">Rs. {orderGetData?.itemsPrice}</p>
+                    <p className="font-semibold">Rs. {orderGetData?.itemsPrice?.toFixed(2)}</p>
                   </td>
                 </tr>
                 <tr>
@@ -270,7 +270,7 @@ export default function Invoice() {
                     <strong>INVOICE AMOUNT </strong>
                   </td>
                   <td colSpan="2" className="border px-2 py-1">
-                    <p>{orderGetData?.itemsPrice} </p>
+                    <p>{orderGetData?.itemsPrice?.toFixed(2)} </p>
                   </td>
                   <td colSpan="3" className="border px-2 py-1">
                     <p>CURRENCY : INR </p>
