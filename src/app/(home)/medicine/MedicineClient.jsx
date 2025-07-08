@@ -15,16 +15,19 @@ export default function MedicineClient({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const [selectedLetter, setSelectedLetter] = useState(initialLetter || "A");
+  const getLetterParam = searchParams.get("letter");
+  const [selectedLetter, setSelectedLetter] = useState(getLetterParam);
   const [currentPage, setCurrentPage] = useState(Number(initialPage) || 1);
   const [categories, setCategories] = useState(categoryData || []); // For storing the fetched categories
   const [totalItems, setTotalItems] = useState(pagination.totalItems || 0); // Total items count
   const [totalPages, setTotalPages] = useState(pagination.totalPages || 1); // Total pages count
-  const [limit, setLimit] = useState(10); // Set limit per page, adjust as needed
+  const [limit, setLimit] = useState(12); // Set limit per page, adjust as needed
 
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
+  useEffect(() => {
+    router.replace(`/medicine?letter=A&page=1`)
+  },[])
   // Sync state with URL params whenever they change (including browser back/forward)
   useEffect(() => {
     const letterParam = searchParams.get("letter");

@@ -41,7 +41,7 @@ const Menu = () => {
               Home
             </Link>
             <Link
-              href="/medicine?letter=A&page=1"
+              href="/medicine"
               className="px-3 py-2 rounded-md hover:bg-gray-100"
             >
               Medicine
