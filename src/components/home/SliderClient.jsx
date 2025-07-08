@@ -6,8 +6,10 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import { IMAGES } from "@/components/common/images";
+import { useRouter } from "next/navigation";
 
 const SliderClient = ({ slides }) => {
+  const router = useRouter()
   return (
     <>
       <section className="px-5 md:px-0 z-10">
@@ -155,13 +157,14 @@ const SliderClient = ({ slides }) => {
                 {slides.map((slide, i) => (
                   <SwiperSlide key={i}>
                     <Image
+                    onClick={() => router.push(`/${slide?.url}`)}
                       src={
                         slide?.slide_image
                           ? `https://assets1.drugcarts.com/admincolor/homepage/slider/${slide?.slide_image}`
                           : IMAGES.NO_IMAGE
                       }
                       alt="Drugcarts - Find best medicines and healthcare products online|Drugcarts.com"
-                      className="rounded-lg h-[220px] md:h-[350px] w-full"
+                      className="rounded-lg h-[220px] md:h-[350px] w-full cursor-pointer"
                       width={500}
                       height={100}
                       priority

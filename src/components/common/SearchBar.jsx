@@ -83,16 +83,16 @@ export default function SearchBar() {
               }}
               className="px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100 flex items-center"
             >
-              <Image
-                src={
-                  item?.product_img
-                    ? `https://assets2.drugcarts.com/${item?.product_img}`
-                    : IMAGES.NO_IMAGE
-                }
+              <img
+                src={`https://drugcarts-nextjs.s3.ap-south-1.amazonaws.com/${item?.product_img}`}
                 alt={item?.product_name}
                 className="w-6 h-6"
-                width={48}
-                height={48}
+                width={100}
+                height={100}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = `https://assets2.drugcarts.com/${item?.product_img}`;
+                }}
               />
               <p className="ml-3">{item?.product_name}</p>
             </li>
