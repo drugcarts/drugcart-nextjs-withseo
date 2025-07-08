@@ -1,10 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Box, Pagination, Typography } from "@mui/material";
 import { IMAGES } from "@/components/common/images";
-import Image from "next/image";
 
 export default function MedicineClient({
   pageBannerUrl,
@@ -16,13 +16,8 @@ export default function MedicineClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [selectedLetter, setSelectedLetter] = useState(initialLetter || "A");
+  const [selectedLetter, setSelectedLetter] = useState(initialLetter);
   const [currentPage, setCurrentPage] = useState(Number(initialPage) || 1);
-  const [categories, setCategories] = useState(categoryData || []); // For storing the fetched categories
-  const [totalItems, setTotalItems] = useState(pagination.totalItems || 0); // Total items count
-  const [totalPages, setTotalPages] = useState(pagination.totalPages || 1); // Total pages count
-  const [limit, setLimit] = useState(10); // Set limit per page, adjust as needed
-
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
   // Sync state with URL params whenever they change (including browser back/forward)
@@ -30,55 +25,18 @@ export default function MedicineClient({
     const letterParam = searchParams.get("letter") || initialLetter || "A";
     const pageParam = parseInt(searchParams.get("page") || initialPage || "1", 10);
 
-    // Update selectedLetter and currentPage if needed
     if (letterParam !== selectedLetter) setSelectedLetter(letterParam);
     if (pageParam !== currentPage) setCurrentPage(pageParam);
-  }, []);
+  }, [searchParams, initialLetter, initialPage]);
 
-  // Fetch category data whenever the selected letter, page, or limit changes
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const letterParam = selectedLetter || ""; // "" for "View All"
-        const res = await fetch(
-          `/api/category/first-letter?search=${letterParam}&page=${currentPage}&limit=${limit}&cat_type=prescriptions`
-        );
-        const data = await res.json();
-        if (data) {
-          setCategories(data.categories || []);
-          setTotalItems(data.pagination?.totalItems || 0);
-          setTotalPages(data.pagination?.totalPages || 1);
-        }
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, [selectedLetter, currentPage, limit]);
-
-  // Handle letter button click
   const handleLetterClick = (letter) => {
-    setSelectedLetter(letter); // Update the selected letter
-    setCurrentPage(1); // Reset to the first page when a new letter is selected
     router.push(`/medicine?letter=${letter}&page=1`, { scroll: false });
   };
 
-  // Handle page change
   const handlePageChange = (_, value) => {
-    setCurrentPage(value);
-    router.push(`/medicine?letter=${selectedLetter || ""}&page=${value}`, { scroll: false });
+    router.push(`/medicine?letter=${selectedLetter}&page=${value}`, { scroll: false });
   };
 
-  // Handle View All button click
-  const handleViewAllClick = () => {
-    // Reset the letter and page to show all categories
-    setSelectedLetter(""); // Empty string to show all categories
-    setCurrentPage(1); // Reset to page 1
-    router.push(`/medicine?letter=&page=1`, { scroll: false }); // Update URL
-  };
-
-  // Handle category click
   const handleCategoryClick = (url) => {
     router.push(`/catalog/${url}`);
   };
@@ -115,14 +73,15 @@ export default function MedicineClient({
       />
     );
   };
-
   return (
     <section className="max-w-7xl mx-auto py-8">
       <Image
         priority
-        src={pageBannerUrl?.image
-          ? `https://assets1.drugcarts.com/admincolor/homepage/pagebanner/${pageBannerUrl.image}`
-          : IMAGES.NO_IMAGE}
+        src={
+          pageBannerUrl?.image
+            ? `https://assets1.drugcarts.com/admincolor/homepage/pagebanner/${pageBannerUrl.image}`
+            : IMAGES.NO_IMAGE
+        }
         alt="Ayush Banner"
         className="w-full h-[200px] rounded-xl"
         width={1200}
@@ -135,29 +94,47 @@ export default function MedicineClient({
         {alphabet.map((letter) => (
           <button
             key={letter}
-            className={`${selectedLetter === letter ? "bg-[#B7084B]" : "bg-[#35A24D]"} px-3 py-1 text-white rounded-md`}
+            className={`${selectedLetter === letter ? "bg-[#B7084B]" : "bg-[#35A24D]"
+              } px-3 py-1 text-white rounded-md`}
             onClick={() => handleLetterClick(letter)}
           >
             {letter}
           </button>
         ))}
-        <button
-          className={`${selectedLetter === "" ? "bg-[#B7084B]" : "bg-[#35A24D]"} px-3 py-1 text-white rounded-md`}
-          onClick={handleViewAllClick} // View All logic
+        {/* <button
+          className={`${selectedLetter === "" ? "bg-[#B7084B]" : "bg-[#35A24D]"
+            } px-3 py-1 text-white rounded-md`}
+          onClick={() => handleLetterClick("")}
         >
           View All
-        </button>
+        </button> */}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3 pb-20 px-2 md:px-0">
-        {categories.map((category, i) => (
+        {categoryData.map((category, i) => (
           <div
             key={i}
             className="bg-bgshop rounded-lg p-4 cursor-pointer"
             onClick={() => handleCategoryClick(category.url)}
           >
-            <CategoryImage categories={category} />
-            <span className="capitalize">{category.category_name}</span>
+            <p className="text-center">
+              {/* <Image
+                width={100}
+                height={100}
+                src={
+                  category.cat_img
+                    ? `https://assets2.drugcarts.com/category/thumb/${category.cat_img}`
+                    : IMAGES.NO_IMAGE
+                }
+                alt={category.category_name}
+                className={`mb-3 mx-auto object-cover ${category.cat_img ? "bg-bgcancer" : "bg-white"
+                  } rounded-full p-2`}
+              /> */}
+              <CategoryImage
+                categories={category}
+              />
+              <span className="capitalize">{category.category_name}</span>
+            </p>
           </div>
         ))}
       </div>
@@ -171,11 +148,11 @@ export default function MedicineClient({
         }}
       >
         <Typography fontFamily={"Poppins"}>
-          Showing {((currentPage - 1) * limit) + 1}–{Math.min(currentPage * limit, totalItems)} of {totalItems || 0} entries
+          Showing 1–10 of {pagination.totalItems || 0} entries
         </Typography>
         <Pagination
           size="large"
-          count={totalPages || 1}
+          count={pagination.totalPages || 1}
           page={currentPage}
           color="secondary"
           onChange={handlePageChange}

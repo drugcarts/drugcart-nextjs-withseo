@@ -11,7 +11,7 @@ export default async function Medicine({ searchParams }) {
 
   const [medicineBanner, data] = await Promise.all([
     getMedicineBannerData("medicine"),
-    getCategoryData(firstLetter === "" ? "A" : firstLetter, page || 1),  // Ensure `letter` as empty is treated properly
+    getCategoryData(firstLetter, page || 1),
   ]);
 
   return (
