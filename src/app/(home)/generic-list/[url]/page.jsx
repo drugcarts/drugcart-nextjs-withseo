@@ -88,10 +88,7 @@ const GenericProductListPage = async ({ params }) => {
       <div className="py-2 text-xl font-bold">
         <h2 className="ml-2">List of Medicine</h2>
       </div>
-      <div className="flex flex-wrap">
-        <div className="w-[20%] flex-none hidden md:block">
           <ClientFilterPanel productData={productList} />
-        </div>
         <div className="w-full md:w-[80%] flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:p-3 content-center place-items-center">
             {productList?.products?.map((product, i) => (
@@ -150,7 +147,6 @@ const GenericProductListPage = async ({ params }) => {
             ))}
           </div>
         </div>
-      </div>
     </section>
   );
 };
