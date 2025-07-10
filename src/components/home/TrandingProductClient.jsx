@@ -22,13 +22,21 @@ const TrandingProductClient = ({ initialData, initialTab }) => {
   const [products, setProducts] = useState(initialData?.products || []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await GetProductTypeService(1, 8, activeTab);
-      if (res?.products) {
-        setProducts(res?.products);
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(
+          `/api/product/type?page=${page}&limit=${10}&type=${activeTab}&search=${search}`
+        );
+        const data = await res.json();
+        if (data) {
+          setProducts(data.products || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
       }
     };
-    fetchData();
+
+    fetchCategories();
   }, [activeTab]);
 
   const bestSellers = [
@@ -40,39 +48,26 @@ const TrandingProductClient = ({ initialData, initialTab }) => {
   const ProductClick = (url) => {
     router.push(`/product/${url}`);
   };
+
+  console.log('fraquency', activeTab);
+
   return (
     <section className="mt-10">
       <div className="grid grid-cols-1 md:grid-cols-[4.5fr_1.5fr] gap-4 mb-10">
         <div>
-          <div className="flex flex-wrap justify-between items-center p-3 border border-t-1 ">
-            <div className="flex w-full md:w-1/2 mb-4 mg:mb-0">
-              <h2 className="text-xl font-bold">Trending This Week</h2>
-            </div>
+          <div className="flex flex-wrap justify-between items-center p-3 border border-t-1">
+            <h2 className="text-xl font-bold mb-4 md:mb-0">Trending This Week</h2>
             <div className="flex space-x-4">
-              <button
-                className={`px-4 py-2 border rounded-lg ${
-                  activeTab === "Popular" ? "bg-pink-500 text-white" : ""
-                }`}
-                onClick={() => setActiveTab("Popular")}
-              >
-                Popular
-              </button>
-              <button
-                className={`px-4 py-2 border rounded-lg ${
-                  activeTab === "Top Brands" ? "bg-pink-500 text-white" : ""
-                }`}
-                onClick={() => setActiveTab("Top Brands")}
-              >
-                Top Brands
-              </button>
-              <button
-                className={`px-4 py-2 border rounded-lg ${
-                  activeTab === "newarrivals" ? "bg-pink-500 text-white" : ""
-                }`}
-                onClick={() => setActiveTab("Frequently")}
-              >
-                Frequently
-              </button>
+              {["Popular", "Top Brands", "Frequently"].map((tab) => (
+                <button
+                  key={tab}
+                  className={`px-4 py-2 border rounded-lg ${activeTab === tab ? "bg-pink-500 text-white" : ""
+                    }`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:p-3 content-center place-items-center border border-t-0">
@@ -136,6 +131,7 @@ const TrandingProductClient = ({ initialData, initialTab }) => {
                 </div>
               ))}
           </div>
+
         </div>
         <div className="bg-[#FFEFF5] rounded-md shadow-md">
           <div className="p-3">

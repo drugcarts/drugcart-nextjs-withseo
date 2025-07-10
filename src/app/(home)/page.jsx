@@ -95,6 +95,15 @@ export async function generateMetadata() {
     };
   }
 }
+async function fetchTabData(tab) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product/type?page=1&limit=8&type=${tab}&search=`,
+    { cache: "no-store" }
+  );
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data?.products || [];
+}
 
 export default async function Home() {
   const page = 1;
@@ -108,6 +117,12 @@ export default async function Home() {
   const type = "Popular";
   const productData = await GetProductTypeService(page, showNo, type, search);
 
+  const [popular, topBrands, frequently] = await Promise.all([
+    fetchTabData("Popular"),
+    fetchTabData("Top Brands"),
+    fetchTabData("Frequently"),
+  ]);
+
   return (
     <main className="max-w-7xl mx-auto p-2">
       <SliderClient slides={mainSliderUrl} />
@@ -119,8 +134,15 @@ export default async function Home() {
           <TopCategoryClient categories={data?.categories || []} />
         </div>
       </section>
-      {/* <TrandingProductClient initialData={productData} initialTab={type} /> */}
-      <TrandingProduct />
+      <TrandingProductClient
+        tabData={{
+          "Popular": popular,
+          "Top Brands": topBrands,
+          "Frequently": frequently,
+        }}
+        initialTab="Popular"
+      />
+      {/* <TrandingProduct /> */}
       <BannerGroup />
       <ServiceGroup />
       <FeaturedPackage />
