@@ -45,6 +45,38 @@ const TrandingProductClient = ({ initialData, initialTab }) => {
     { id: 3, name: "Gel Oil", price: "$250", image: Wheatgrass },
   ];
 
+  const ProductImage = ({ product, width, height, className }) => {
+    const primaryImage = product?.product_img
+      ? `https://assets2.drugcarts.com/${product.product_img}`
+      : null;
+
+    const fallbackImage = product?.product_img
+      ? `https://drugcarts-nextjs.s3.ap-south-1.amazonaws.com/${product.product_img}`
+      : null;
+
+    const [imgSrc, setImgSrc] = useState(primaryImage || IMAGES.NO_IMAGE);
+
+    const handleError = () => {
+      if (imgSrc !== fallbackImage && fallbackImage) {
+        setImgSrc(fallbackImage);
+      } else {
+        setImgSrc(IMAGES.NO_IMAGE);
+      }
+    };
+
+    return (
+      <Image
+        priority
+        src={imgSrc}
+        alt={product?.product_name || "Product Image"}
+        width={width}
+        height={height}
+        className={className}
+        onError={handleError}
+      />
+    );
+  };
+
   const ProductClick = (url) => {
     router.push(`/product/${url}`);
   };
@@ -84,14 +116,8 @@ const TrandingProductClient = ({ initialData, initialTab }) => {
                       </div>
                     ) : null}
                   </div>
-                  <Image
-                    priority
-                    src={
-                      product?.product_img
-                        ? `https://assets2.drugcarts.com/${product?.product_img}`
-                        : IMAGES.NO_IMAGE
-                    }
-                    alt={product?.product_name}
+                  <ProductImage
+                    product={product}
                     width={250}
                     height={200}
                     className="p-2 w-[250px] h-[200px] my-1 mx-auto"
