@@ -82,7 +82,7 @@ const Menu = () => {
             </div>
             <div className="relative group">
               <button className="px-3 py-2 rounded-md hover:bg-gray-100">
-                <Link href="/health-store">Health Care</Link>
+                <Link href="/health-care-devices">Health Care</Link>
               </button>
               <div className="absolute z-50 left-0 mt-0 hidden group-hover:block bg-white text-gray-800 rounded-md shadow-lg w-40">
                 <Link
