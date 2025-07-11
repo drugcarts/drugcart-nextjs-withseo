@@ -99,8 +99,6 @@ const Catalog = async ({ params }) => {
               imageAlt={sub?.cat_name}
               imagUrl={
                 sub?.cat_img
-                  ? `https://assets2.drugcarts.com/category/thumb/${sub?.cat_img}`
-                  : IMAGES.NO_IMAGE
               }
             />
           </ClientWrapper>

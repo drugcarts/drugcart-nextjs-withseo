@@ -112,7 +112,7 @@ export default function MedicineClient({
         alt={categories?.category_name || "Category Image"}
         width={100}
         height={100}
-        className={`mb-3 mx-auto object-cover ${categories.cat_img ? "bg-bgcancer" : "bg-white"
+        className={`mb-3 mx-auto w-24 h-24 object-cover ${categories.cat_img ? "bg-bgcancer" : "bg-white"
           } rounded-full p-2`}
         onError={handleError}
       />
