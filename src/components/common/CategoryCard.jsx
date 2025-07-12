@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from "react";
 import Image from "next/image";
+import { IMAGES } from "./images";
 
 function CategoryCard({ imagUrl, imageAlt, title, onClick }) {
 

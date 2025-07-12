@@ -26,7 +26,7 @@ export default function MedicineClient({
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
   useEffect(() => {
-    router.replace(`/medicine?letter=A&page=1`)
+    router.replace(`/medicine?letter=${selectedLetter || "A"}&page=${currentPage}`)
   },[])
   // Sync state with URL params whenever they change (including browser back/forward)
   useEffect(() => {
