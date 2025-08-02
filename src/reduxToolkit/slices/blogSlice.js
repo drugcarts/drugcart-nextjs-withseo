@@ -4,7 +4,9 @@ const initialState = {
     blogList: [],
     newBlog: {},
     blog: {},
-    blogUrl: {}
+    blogUrl: {},
+    blogLatest: {},
+    blogTranding: {}
 }
 const blogSlice = createSlice({
     name: 'blog',
@@ -21,9 +23,15 @@ const blogSlice = createSlice({
         },
         getBlogUrl: (state, { payload }) => {
             state.blogUrl = payload
+        },
+        getBlogLatest: (state, { payload }) => {
+            state.blogLatest = payload
+        },
+        getBlogTranding: (state, { payload }) => {
+            state.blogTranding = payload
         }
     }
 })
 
-export const { addBlog, getBlogs, getBlog, getBlogUrl } = blogSlice.actions
+export const { addBlog, getBlogs, getBlog, getBlogUrl, getBlogLatest, getBlogTranding } = blogSlice.actions
 export default blogSlice.reducer

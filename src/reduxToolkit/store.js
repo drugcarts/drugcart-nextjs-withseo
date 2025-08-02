@@ -56,6 +56,7 @@ import notifyReducer from "@/reduxToolkit/slices/notifySlice";
 import orderPrescriptionReducer from "@/reduxToolkit/slices/orderPrescriptionSlice";
 import metaTagsReducer from "@/reduxToolkit/slices/metaTagsSlice";
 import countReducer from "@/reduxToolkit/slices/countSlice";
+import labInfoReducer from "@/reduxToolkit/slices/labInfoSlice";
 
 export const store = configureStore({
     reducer: {
@@ -115,6 +116,7 @@ export const store = configureStore({
         orderPrescriptionData: orderPrescriptionReducer,
         metaTagsData: metaTagsReducer,
         adminUserData: adminUserReducer,
-        countData: countReducer
+        countData: countReducer,
+        labInfoData: labInfoReducer
     }
 })

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { IsLoading, showToast } from '../reduxToolkit/slices/commonSlice'
 import Authorization from '../utils/authorization'
-import { addBlog, getBlogs, getBlog, getBlogUrl } from '../reduxToolkit/slices/blogSlice'
+import { addBlog, getBlogs, getBlog, getBlogUrl, getBlogLatest, getBlogTranding } from '../reduxToolkit/slices/blogSlice'
 
 const PostBlogService = (data, resetForm) => async (dispatch) => {
     try {
@@ -74,4 +74,28 @@ const DeleteBlogService = (id) => async (dispatch) => {
     })
 }
 
-export { PostBlogService, GetBlogService, GetBlogIdService, GetBlogUrlService, PutBlogService, DeleteBlogService }
+const GetLatestBlogService = (page = 1, limit = 3, search = "", type ="Latest") => async (dispatch) => {
+    try {
+        dispatch(IsLoading(true))
+        const getData = await axios.get(`/api/blog?page=${page}&limit=${limit}&search=${search}&blogtype=${type}`, { headers: await Authorization() })
+        dispatch(getBlogLatest(getData.data))
+        dispatch(IsLoading(false))
+    } catch (error) {
+        dispatch(IsLoading(false))
+        console.log("error", error.message)
+    }
+}
+
+const GetTrandingBlogService = (page = 1, limit = 3, search = "", type ="Tranding") => async (dispatch) => {
+    try {
+        dispatch(IsLoading(true))
+        const getData = await axios.get(`/api/blog?page=${page}&limit=${limit}&search=${search}&blogtype=${type}`, { headers: await Authorization() })
+        dispatch(getBlogTranding(getData.data))
+        dispatch(IsLoading(false))
+    } catch (error) {
+        dispatch(IsLoading(false))
+        console.log("error", error.message)
+    }
+}
+
+export { PostBlogService, GetBlogService, GetBlogIdService, GetBlogUrlService, PutBlogService, DeleteBlogService, GetLatestBlogService, GetTrandingBlogService }
